@@ -57,7 +57,7 @@ def get_metadata_for_pdf(pdf_name):
         return "Unable to find metadata"
 
 # Streamlit UI
-st.title("PDF or DOI Metadata Extractor")
+st.title("Unified Information Retrieval from Diverse Publication Formats ")
 
 # Let the user choose between PDF or DOI
 option = st.radio("Choose input method:", ("Upload a PDF", "Enter DOI"))
