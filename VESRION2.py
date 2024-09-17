@@ -76,7 +76,9 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Main title
+# Main title with an icon at the top
+icon_path = "https://as1.ftcdn.net/v2/jpg/04/03/43/28/1000_F_403432800_GB7ZccxkrSnqBHABDMVHfmBYFhM5mBBs.jpg" # Path to the uploaded icon file
+st.image(icon_path, width=100)  # Display the icon with a specified width
 st.title("Unified Information Retrieval from Diverse Publication Formats")
 
 # Let the user choose between PDF or DOI (radio buttons side by side)
@@ -85,9 +87,6 @@ option = st.radio("Choose input method:", ("Upload a PDF", "Enter DOI"))
 if option == "Upload a PDF":
     # File uploader for PDF
     uploaded_file = st.file_uploader("Upload a PDF", type=["pdf"])
-
-    # Add image uploader for a research paper/document
-    uploaded_image = st.file_uploader("Upload an image of the research paper (optional)", type=["png", "jpg", "jpeg"])
 
     if uploaded_file is not None:
         # Get the uploaded file name
@@ -100,10 +99,6 @@ if option == "Upload a PDF":
         # Display the metadata
         st.subheader("Extracted Metadata:")
         st.write(metadata)
-
-        # Display the uploaded image (if provided)
-        if uploaded_image is not None:
-            st.image(uploaded_image, caption="Uploaded Research Paper", use_column_width=True)
 
 elif option == "Enter DOI":
     # Text input for DOI
