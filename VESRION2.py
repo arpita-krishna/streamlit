@@ -22,11 +22,21 @@ def extract_metadata_from_doi(doi):
         title_tag = soup.find('title')
         title = title_tag.get_text() if title_tag else "Title not found"
 
-        # Example: extract abstract (customize based on the page structure)
-        abstract_tag = soup.find('div', {'class': 'abstract'})
-        abstract = abstract_tag.get_text() if abstract_tag else "Abstract not found"
+        # Extract abstract (can vary in location on the page)
+        abstract_tag = soup.find('div', {'class': 'abstract'}) or soup.find('section', {'class': 'abstract'})
+        abstract = abstract_tag.get_text().strip() if abstract_tag else "Abstract not found"
 
-        return f"Title: {title}\nAbstract: {abstract}"
+        # Attempt to extract authors, published date, and publisher
+        authors_tag = soup.find('meta', {'name': 'citation_author'})
+        authors = authors_tag['content'] if authors_tag else "Authors not found"
+
+        published_date_tag = soup.find('meta', {'name': 'citation_publication_date'})
+        published_date = published_date_tag['content'] if published_date_tag else "Publication date not found"
+
+        publisher_tag = soup.find('meta', {'name': 'citation_publisher'})
+        publisher = publisher_tag['content'] if publisher_tag else "Publisher not found"
+
+        return f"Title: {title}\nAuthors: {authors}\nPublished Date: {published_date}\nPublisher: {publisher}\nAbstract: {abstract}"
 
     except Exception as e:
         return f"Error extracting metadata: {str(e)}"
@@ -44,14 +54,40 @@ def get_metadata_for_pdf(pdf_name):
         return "Unable to find metadata"
 
 # Streamlit UI
-st.title("PDF or DOI Metadata Extractor")
+st.set_page_config(page_title="Unified Information Retrieval from Diverse Publication Formats")
 
-# Let the user choose between PDF or DOI
+# Add custom styles for the background and text color
+st.markdown(
+    """
+    <style>
+    body {
+        background-color: white;
+        color: black;
+    }
+    .css-18e3th9 {
+        padding: 20px 40px;
+    }
+    .stRadio > div {
+        display: flex;
+        flex-direction: row;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+# Main title
+st.title("Unified Information Retrieval from Diverse Publication Formats")
+
+# Let the user choose between PDF or DOI (radio buttons side by side)
 option = st.radio("Choose input method:", ("Upload a PDF", "Enter DOI"))
 
 if option == "Upload a PDF":
     # File uploader for PDF
     uploaded_file = st.file_uploader("Upload a PDF", type=["pdf"])
+
+    # Add image uploader for a research paper/document
+    uploaded_image = st.file_uploader("Upload an image of the research paper (optional)", type=["png", "jpg", "jpeg"])
 
     if uploaded_file is not None:
         # Get the uploaded file name
@@ -65,6 +101,10 @@ if option == "Upload a PDF":
         st.subheader("Extracted Metadata:")
         st.write(metadata)
 
+        # Display the uploaded image (if provided)
+        if uploaded_image is not None:
+            st.image(uploaded_image, caption="Uploaded Research Paper", use_column_width=True)
+
 elif option == "Enter DOI":
     # Text input for DOI
     doi = st.text_input("Enter the DOI for the PDF:")
@@ -74,5 +114,5 @@ elif option == "Enter DOI":
         doi_metadata = extract_metadata_from_doi(doi)
 
         # Display the extracted metadata
-        st.subheader("Extracted Metadata from DOI:")
+        st.subheader("Extracted Metadata:")
         st.write(doi_metadata)
