@@ -35,12 +35,11 @@ def extract_metadata_from_doi(doi):
 
         publisher_tag = soup.find('meta', {'name': 'citation_publisher'})
         publisher = publisher_tag['content'] if publisher_tag else "Publisher not found"
-
-        return f"Title: {title}\nAuthors: {authors}\nPublished Date: {published_date}\nPublisher: {publisher}\nAbstract: {abstract}"
+        return f"**Title**: {title}\n\n**Authors**: {authors}\n\n**Published Date**: {published_date}\n\n**Publisher**: {publisher}\n\n**Abstract**: {abstract}"
 
     except Exception as e:
         return f"Error extracting metadata: {str(e)}"
-
+        
 # Function to get metadata based on PDF filename
 def get_metadata_for_pdf(pdf_name):
     # Search for the PDF filename in the dataset
