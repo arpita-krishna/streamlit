@@ -1,43 +1,30 @@
 import streamlit as st
 import pandas as pd
 from datasets import load_dataset
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.chrome.options import Options
+import requests
 from bs4 import BeautifulSoup
 
 # Load the dataset from Hugging Face Hub
 dataset = load_dataset("Appz7/t5-metadata-extraction-dataset3")
 df = dataset['train'].to_pandas()
 
-# Function to extract metadata from the DOI page using Selenium
+# Function to extract metadata from DOI using requests and BeautifulSoup
 def extract_metadata_from_doi(doi):
     try:
-        chrome_options = Options()
-        chrome_options.add_argument("--headless")  # Run Chrome in headless mode
-
-        # Automatically install and use the correct ChromeDriver version
-        service = Service(ChromeDriverManager().install())
-        driver = webdriver.Chrome(service=service, options=chrome_options)
-
-        # Open the DOI link
+        # Send a GET request to the DOI page
         doi_link = f"https://doi.org/{doi}"
-        driver.get(doi_link)
+        response = requests.get(doi_link)
 
-        # Extract the page source
-        page_source = driver.page_source
-        soup = BeautifulSoup(page_source, 'html.parser')
+        # Parse the page source
+        soup = BeautifulSoup(response.content, 'html.parser')
 
         # Extract metadata from the page
         title_tag = soup.find('title')
         title = title_tag.get_text() if title_tag else "Title not found"
 
-        # Example: extract abstract (this can be customized based on the webpage structure)
+        # Example: extract abstract (customize based on the page structure)
         abstract_tag = soup.find('div', {'class': 'abstract'})
         abstract = abstract_tag.get_text() if abstract_tag else "Abstract not found"
-
-        driver.quit()
 
         return f"Title: {title}\nAbstract: {abstract}"
 
@@ -57,7 +44,7 @@ def get_metadata_for_pdf(pdf_name):
         return "Unable to find metadata"
 
 # Streamlit UI
-st.title("Unified Information Retrieval from Diverse Publication Formats ")
+st.title("PDF or DOI Metadata Extractor")
 
 # Let the user choose between PDF or DOI
 option = st.radio("Choose input method:", ("Upload a PDF", "Enter DOI"))
