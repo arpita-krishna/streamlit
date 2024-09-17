@@ -1,3 +1,5 @@
 streamlit
 datasets
 pandas
+requests
+beautifulsoup4
